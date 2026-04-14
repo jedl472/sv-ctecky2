@@ -9,7 +9,12 @@
 
 #define DEBOUNCE_MS 100
 
-QueueHandle_t buttonQueue;
+// TODO: tady by melo byt extreme jednoduche dodelat detekci toho, jestli bylo tlacitko zmacknuto nebo pusteno.
+// (pak by mohl byt isr nastaven normalne jako GPIO_INTR_ANYEDGE). Problem je, ze cteni hodnoty pinu gpio_get_level()
+// kvuli bouncovani hazi random hodnoty (i v isr). Necht je toto hlavolam na pozdeji.
+
+QueueHandle_t isrButtonQueue;
+QueueHandle_t buttonEventQueue;
 
 typedef enum {
   BTN_RIGHT,
@@ -33,48 +38,63 @@ const gpio_num_t button_pins[BTN_COUNT] = {
 typedef struct {
   button_id_t id;
   uint32_t time;
+} isr_button_event_t;
+
+
+
+typedef enum {
+  ACTION_BTN_PRESS/*,
+  ACTION_BTN_RELEASE*/
+} button_action_type_t;
+
+typedef struct {
+  button_id_t id;
+  button_action_type_t action;
+  uint32_t time;
 } button_event_t;
+
+
+
 
 static void IRAM_ATTR gpio_isr_handler(void *args) {
   button_id_t button = (button_id_t)args;
 
-  button_event_t event = {
+  isr_button_event_t event = {
     .id = button,
-    .time = xTaskGetTickCountFromISR()
+    .time = xTaskGetTickCountFromISR(),
   };
 
   BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-  xQueueSendFromISR(buttonQueue, &event, &xHigherPriorityTaskWoken);
+  xQueueSendFromISR(isrButtonQueue, &event, &xHigherPriorityTaskWoken);
 }
 
-
-
-
 void button_control_task(void *args) {
-  button_event_t event;
+  isr_button_event_t isr_event;
   uint32_t last_press_time[BTN_COUNT] = {0};
 
   for(;;) {
-    if(xQueueReceive(buttonQueue, &event, portMAX_DELAY)) {
-      if (event.time - last_press_time[event.id] < pdMS_TO_TICKS(DEBOUNCE_MS))
+    if(xQueueReceive(isrButtonQueue, &isr_event, portMAX_DELAY)) {
+      if (isr_event.time - last_press_time[isr_event.id] < pdMS_TO_TICKS(DEBOUNCE_MS))
         continue;
 
-      last_press_time[event.id] = event.time;
+      last_press_time[isr_event.id] = isr_event.time;
 
-      uint8_t level = gpio_get_level(button_pins[event.id]);
+      printf("btn %d pressed\n", isr_event.id);  
       
-      if (level == 0)  {// pouze pokud jsou tlacitka pripojena na pull up
-        printf("btn %d pressed\n", event.id);
-      } else {
-        printf("btn %d released\n", event.id);
-      }
+      button_event_t event = {
+        .id = isr_event.id,
+        .action = ACTION_BTN_PRESS,
+        .time = isr_event.time
+      };
+
+      xQueueSend(buttonEventQueue, &event, 0);
     }
   }
 }
 
 void app_main(void) {
-  buttonQueue = xQueueCreate(10, sizeof(button_event_t));
-
+  isrButtonQueue = xQueueCreate(10, sizeof(isr_button_event_t));
+  buttonEventQueue = xQueueCreate(10, sizeof(button_event_t));
   
   gpio_install_isr_service(0);
   
@@ -83,9 +103,9 @@ void app_main(void) {
     gpio_set_direction(button_pins[i], GPIO_MODE_INPUT);
     gpio_pullup_en(button_pins[i]);
     gpio_pulldown_dis(button_pins[i]);
-    gpio_set_intr_type(button_pins[i], GPIO_INTR_ANYEDGE);
+    gpio_set_intr_type(button_pins[i], GPIO_INTR_NEGEDGE);
 
-    gpio_isr_handler_add(button_pins[i], gpio_isr_handler, (void*)(button_pins[i]));
+    gpio_isr_handler_add(button_pins[i], gpio_isr_handler, (void*)(i));
   }
   
   xTaskCreate(button_control_task, "button_control_task", 4096, NULL, 1, NULL);

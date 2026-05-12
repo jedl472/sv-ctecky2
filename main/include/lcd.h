@@ -9,9 +9,9 @@
 #define PIN_LCD_MOSI 23
 #define PIN_LCD_CS 5
 
-extern u8g2_t display_lcd;
+extern u8g2_t lcd;
 
-void display_lcd_setup();
+void lcd_setup();
 
 
 #endif 

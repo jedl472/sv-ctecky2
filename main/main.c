@@ -9,13 +9,13 @@
 
 #include "sdkconfig.h"
 
-#include "display.h"
+#include "lcd.h"
 #include "input.h"
 
 void app_main(void) {
   printf("setup started\n");
   //input_setup();
-  display_lcd_setup();
+  lcd_setup();
 
   printf("setup finished\n");
 }

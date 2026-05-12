@@ -1,0 +1,17 @@
+#ifndef DISPLAY_H
+#define DISPLAY_H 
+
+#include <esp_log.h>
+
+#include "u8g2_esp32_hal.h"
+
+#define PIN_LCD_CLK 18
+#define PIN_LCD_MOSI 23
+#define PIN_LCD_CS 5
+
+extern u8g2_t display_lcd;
+
+void display_lcd_setup();
+
+
+#endif 

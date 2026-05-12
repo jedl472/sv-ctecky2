@@ -8,8 +8,14 @@
 #include <u8g2.h>
 
 #include "sdkconfig.h"
-#include "u8g2_esp32_hal.h"
+
+#include "display.h"
+#include "input.h"
 
 void app_main(void) {
+  printf("setup started\n");
+  //input_setup();
+  display_lcd_setup();
 
+  printf("setup finished\n");
 }

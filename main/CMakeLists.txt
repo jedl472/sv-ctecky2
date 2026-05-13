@@ -2,7 +2,7 @@
 set(COMPONENT_REQUIRES )
 set(COMPONENT_PRIV_REQUIRES )
 
-set(COMPONENT_SRCS "main.c" "input.c" "lcd.c")
+set(COMPONENT_SRCS "main.c" "input.c" "lcd.c" "ui.c")
 set(COMPONENT_ADD_INCLUDEDIRS "." "include")
 
 register_component()

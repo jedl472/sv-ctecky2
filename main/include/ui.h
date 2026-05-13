@@ -1,0 +1,19 @@
+#pragma once
+
+#include "lcd.h"
+
+typedef enum {
+  UI_IDLE,
+  UI_MSG,
+  UI_MENU
+} ui_state_t;
+
+typedef struct {
+  ui_state_t state;
+  char msg[32];
+} ui_msg_t;
+
+
+extern QueueHandle_t uiQueue;
+
+void ui_setup(void);

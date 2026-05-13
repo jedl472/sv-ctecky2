@@ -1,5 +1,5 @@
-#ifndef DISPLAY_H
-#define DISPLAY_H 
+#ifndef LCD_H
+#define LCD_H 
 
 #include <esp_log.h>
 

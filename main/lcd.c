@@ -26,5 +26,6 @@ void lcd_setup() {
 	// u8g2_SetFont(&display_lcd, u8g2_font_5x8_tf);
 	// u8g2_DrawStr(&display_lcd, 0,15,"sv-ctecky2");
 	u8g2_SendBuffer(&lcd);
+} // lcd_setup
 
-}
+

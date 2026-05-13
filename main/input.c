@@ -1,6 +1,6 @@
 #include "input.h"
 
-#define DEBOUNCE_MS 200
+#define DEBOUNCE_MS 250
 
 // TODO: tady by melo byt extreme jednoduche dodelat detekci toho, jestli bylo tlacitko zmacknuto nebo pusteno.
 // (pak by mohl byt isr nastaven normalne jako GPIO_INTR_ANYEDGE). Problem je, ze cteni hodnoty pinu gpio_get_level()

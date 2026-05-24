@@ -14,7 +14,7 @@
 #include "nfc.h"
 
 void app_main(void) {
-  printf("setup started\n");
+  printf("APP_MAIN\n");
   input_setup();
   lcd_setup();
   ui_setup();
@@ -31,9 +31,4 @@ void app_main(void) {
 
   ui_msg.state = UI_IDLE;
   xQueueSend(uiQueue, &ui_msg, portMAX_DELAY);
-  
-
-
-
-  printf("setup finished\n");
 }

@@ -1,10 +1,12 @@
 #include "lcd.h"
 
+static const char *TAG = "lcd";
+
+
 u8g2_t lcd;
 
 void lcd_setup() {
-  printf("entering display setup\n");
-  
+
   u8g2_esp32_hal_t u8g2_esp32_hal = U8G2_ESP32_HAL_DEFAULT;
 	u8g2_esp32_hal.bus.spi.clk   = PIN_LCD_CLK;
 	u8g2_esp32_hal.bus.spi.mosi  = PIN_LCD_MOSI;
@@ -26,6 +28,8 @@ void lcd_setup() {
 	// u8g2_SetFont(&display_lcd, u8g2_font_5x8_tf);
 	// u8g2_DrawStr(&display_lcd, 0,15,"sv-ctecky2");
 	u8g2_SendBuffer(&lcd);
+
+  ESP_LOGI(TAG, "lcd setup finished");
 } // lcd_setup
 
 

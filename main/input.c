@@ -1,5 +1,7 @@
 #include "input.h"
 
+static const char *TAG = "input";
+
 #define DEBOUNCE_MS 250
 
 // TODO: tady by melo byt extreme jednoduche dodelat detekci toho, jestli bylo tlacitko zmacknuto nebo pusteno.
@@ -104,4 +106,7 @@ void input_setup(void) {
   }
   
   xTaskCreate(button_control_task, "button_control_task", 4096, NULL, 1, NULL);
+
+
+  ESP_LOGI(TAG, "input and ISR setup finished");
 }

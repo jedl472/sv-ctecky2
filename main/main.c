@@ -11,12 +11,14 @@
 
 #include "ui.h"
 #include "input.h"
+#include "nfc.h"
 
 void app_main(void) {
   printf("setup started\n");
   input_setup();
   lcd_setup();
   ui_setup();
+  nfc_setup();
 
   ui_msg_t ui_msg = {
     .state = UI_MSG,

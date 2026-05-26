@@ -12,6 +12,7 @@
 typedef enum {
   UI_IDLE,
   UI_MSG,
+  UI_REQUEST,
   UI_MENU
 } ui_state_t;
 

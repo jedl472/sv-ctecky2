@@ -40,7 +40,7 @@ void ui_setup(void) {
   uiQueue = xQueueCreate(10, sizeof(ui_msg_t));
 
   xTaskCreate(ui_update_task, "ui_update_task", 4096, NULL, 1, NULL);
-  
+
 
   ESP_LOGI(TAG, "ui setup finished");
 }

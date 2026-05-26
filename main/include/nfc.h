@@ -19,6 +19,12 @@
 #define NFC_RESET_PIN  GPIO_NUM_NC
 #define NFC_IRQ_PIN    GPIO_NUM_NC
 
+
+typedef struct {
+  uint8_t uid[7];
+  uint8_t uid_len;
+} nfc_event_t;
+
 extern QueueHandle_t nfcEventQueue;
 
 void nfc_setup(void);

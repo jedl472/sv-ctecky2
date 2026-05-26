@@ -3,18 +3,10 @@
 static const char *TAG = "nfc";
 
 
-typedef struct {
-  uint8_t uid[7];
-  uint8_t uid_len;
-} nfc_event_t;
-
 QueueHandle_t nfcEventQueue;
 
 pn532_io_t pn532_io;
 esp_err_t err;
-
-
-
 
 
 void nfc_control_task(void *args) {

@@ -12,6 +12,7 @@
 #include "ui.h"
 #include "input.h"
 #include "nfc.h"
+#include "wifi.h"
 
 typedef enum {
   DEV_BOOT,
@@ -70,14 +71,17 @@ void app_main(void) {
   nfc_setup();
 
   ui_msg_t ui_msg = {
-    .state = UI_REQUEST,
-    .msg = ""
+    .state = UI_MSG,
+    .msg = "wifi testing"
   };
 
   xQueueSend(uiQueue, &ui_msg, portMAX_DELAY);
 
-  vTaskDelay(2000/portTICK_PERIOD_MS);
 
+    ESP_ERROR_CHECK(app_wifi_init());
+    ESP_ERROR_CHECK(app_wifi_connect(CONFIG_ESP_WIFI_SSID, CONFIG_ESP_WIFI_PASSWORD));
+
+    ESP_ERROR_CHECK(app_wifi_disconnect());
   // ui_msg.state = UI_IDLE;
   // xQueueSend(uiQueue, &ui_msg, portMAX_DELAY);
 

@@ -8,6 +8,7 @@
 
 
 #include "lcd.h"
+#include "xbm.h"
 
 typedef enum {
   UI_IDLE,

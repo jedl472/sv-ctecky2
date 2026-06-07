@@ -15,12 +15,13 @@ void ui_update_task(void *args) {
       switch(ui_msg.state){
         case UI_IDLE:
           u8g2_SetFont(&lcd, u8g2_font_5x8_tf);
-          u8g2_DrawStr(&lcd, 15,30,"tady nekde sv logo");
+          // u8g2_DrawStr(&lcd, 15,30,"tady nekde sv logo");
+          u8g2_DrawXBM(&lcd, 0, 0, 128, 64, xbm_strela_vlna_logo);
           break;
 
         case UI_MSG:
           u8g2_SetFont(&lcd, u8g2_font_5x8_tf);
-          u8g2_DrawStr(&lcd, 15,25,"tady nekde sv logo");
+          u8g2_DrawXBM(&lcd, 0, -4, 128, 64, xbm_strela_vlna_logo);
 
           u8g2_DrawStr(&lcd, 0,60, ui_msg.msg);
           break;

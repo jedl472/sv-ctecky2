@@ -23,6 +23,22 @@ dev_mode_t dev_mode = DEV_BOOT;
 
 static const char* TAG = "main";
 
+
+
+void cb_request_return_last(void *args) {
+    printf("invoked return last action\n");
+}
+
+
+
+void cb_soft_reboot(void *args) {
+    ESP_LOGI(TAG, "invoking soft reboot callback");
+    esp_restart();
+}
+
+
+
+
 void device_task(void *args) {
   ESP_LOGI(TAG, "boot finished");
   dev_mode = DEV_IDLE;
@@ -34,7 +50,7 @@ void device_task(void *args) {
   while (true) {
     switch (dev_mode) {
       case DEV_IDLE:
-        if(xQueueReceive(nfcEventQueue, &nfc_event, 10/portTICK_PERIOD_MS)) { // MAGIC_VALUE: task pusti kazdych 50 ms
+        if(xQueueReceive(nfcEventQueue, &nfc_event, 50/portTICK_PERIOD_MS)) { // MAGIC_VALUE: task pusti kazdych 50 ms
           ui_msg.state = UI_MSG;
           strcpy(ui_msg.msg, "tag ready");
           xQueueSend(uiQueue, &ui_msg, portMAX_DELAY);
@@ -44,19 +60,34 @@ void device_task(void *args) {
           ui_msg.state = UI_IDLE;
 
           xQueueSend(uiQueue, &ui_msg, portMAX_DELAY);
-
         }
 
-        if(xQueueReceive(buttonEventQueue, &button_event, 10/portTICK_PERIOD_MS)) {
+        if(xQueueReceive(buttonEventQueue, &button_event, 50/portTICK_PERIOD_MS)) {
             if(button_event.action == ACTION_BTN_PRESS && button_event.id == BTN_ENT) {
-                ui_invoke_menu(0, NULL, NULL);
+                
+                ui_menu_struct_t menu_system = {
+                    .length = 3,
+                    .names = (const char *[]){"System info", "Wifi", "Reboot"},
+                    .breakAfterClick = (const bool[]){true, true, true},
+                    .callbacks = (void (*[])(void *)){ui_invoke_sys_info_popup, NULL, cb_soft_reboot},
+                    .args = (void *[]){NULL, NULL, NULL, NULL},
+                };
+
+                ui_menu_struct_t menu = {
+                    .length = 2,
+                    .names = (const char *[]){"Vratit posledni akci", "System"},
+                    .breakAfterClick = (const bool[]){true, false},
+                    .callbacks = (void (*[])(void *)){cb_request_return_last, ui_menu_invoke},
+                    .args = (void *[]){NULL, (void*)&menu_system},
+                };
+                
+                ui_menu_invoke((void*)&menu);
                 
                 ui_msg.state = UI_IDLE;
                 xQueueSend(uiQueue, &ui_msg, portMAX_DELAY);
-
             }
         }
-        printf("test");
+
         break;
       default:
         break;

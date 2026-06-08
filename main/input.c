@@ -51,7 +51,8 @@ void button_control_task(void *args) {
 
       last_press_time[isr_event.id] = isr_event.time;
 
-      printf("btn %d pressed\n", isr_event.id);  
+      // printf("btn %d pressed\n", isr_event.id);  
+      ESP_LOGI(TAG, "btn %d pressed", isr_event.id);
       
       button_event_t event = {
         .id = isr_event.id,

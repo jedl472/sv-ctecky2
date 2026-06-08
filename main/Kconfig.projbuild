@@ -12,3 +12,28 @@ config ESP_WIFI_PASSWORD
     help
 	WiFi password (WPA or WPA2) for the example to use.
 endmenu
+
+
+
+menu "Strela-Vlna system config"
+config SV_SOFTWARE_VERSION
+    string "Software version"
+    default "2.0 beta"
+    help
+    The version of the software inside the device.
+config SV_DEVICE_ID
+    string "Device ID"
+    default 0
+    help
+    The ID of device (currently used are 1 and 2).
+config SV_SERVER
+    string "Strela-Vlna server URL"
+    default "http://192.168.67.69:80"
+    help
+    Server that the device will connect to.
+config SV_SECRET_KEY
+    string "Server secret key"
+    default "<super-secret-key>"
+    help
+    Key that the device will use to authenticate itself with the server (temporary before some real encryption can be implemented).
+endmenu

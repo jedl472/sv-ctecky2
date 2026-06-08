@@ -15,7 +15,7 @@ typedef enum {
   UI_IDLE,
   UI_MSG,
   UI_REQUEST,
-  UI_MENU
+  UI_SYS_INFO_POPUP
 } ui_state_t;
 
 typedef struct {
@@ -23,9 +23,18 @@ typedef struct {
   char msg[32];
 } ui_msg_t;
 
+typedef struct {
+    size_t length;
+    const char** names;
+    const bool* breakAfterClick;
+    void **args;
+    void (**callbacks)(void*);
+} ui_menu_struct_t;
 
 extern QueueHandle_t uiQueue;
 
 void ui_setup(void);
 
-void ui_invoke_menu(uint8_t numberOfItems, char* names, void (*callbacks[])(void));
+void ui_menu_invoke(void* ui_menu_struct);
+
+void ui_invoke_sys_info_popup(void* args);

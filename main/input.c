@@ -13,16 +13,6 @@ QueueHandle_t isrButtonQueue;
 QueueHandle_t buttonEventQueue;
 
 
-typedef enum {
-  BTN_RIGHT,
-  BTN_LEFT,
-  BTN_UP,
-  BTN_DOWN,
-  BTN_ENT,
-  BTN_ESC,
-  BTN_COUNT
-} button_id_t;
-
 const gpio_num_t button_pins[BTN_COUNT] = {
   GPIO_NUM_27,
   GPIO_NUM_26,
@@ -36,21 +26,6 @@ typedef struct {
   button_id_t id;
   uint32_t time;
 } isr_button_event_t;
-
-
-
-typedef enum {
-  ACTION_BTN_PRESS/*,
-  ACTION_BTN_RELEASE*/
-} button_action_type_t;
-
-typedef struct {
-  button_id_t id;
-  button_action_type_t action;
-  uint32_t time;
-} button_event_t;
-
-
 
 
 static void IRAM_ATTR gpio_isr_handler(void *args) {

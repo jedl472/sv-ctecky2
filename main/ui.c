@@ -69,3 +69,26 @@ void ui_setup(void) {
 
   ESP_LOGI(TAG, "ui setup finished");
 }
+
+
+
+void ui_invoke_menu(uint8_t numberOfItems, char* names, void (*callbacks[])(void)) {
+    button_event_t button_event;
+
+    u8g2_ClearBuffer(&lcd);
+    u8g2_SetFont(&lcd, u8g2_font_5x8_tf);
+    u8g2_DrawStr(&lcd, 0,60, "menu_test");
+
+    u8g2_SendBuffer(&lcd);
+    
+
+    while(true) {
+        if(xQueueReceive(buttonEventQueue, &button_event, 50/portTICK_PERIOD_MS)) {
+            if(button_event.action == ACTION_BTN_PRESS && button_event.id == BTN_ESC) {
+                break;
+            }
+        }
+    }
+}
+
+// void ui_update_menu

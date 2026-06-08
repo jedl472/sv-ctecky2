@@ -12,6 +12,26 @@
 #include <stdio.h>
 
 
+typedef enum {
+  BTN_RIGHT,
+  BTN_LEFT,
+  BTN_UP,
+  BTN_DOWN,
+  BTN_ENT,
+  BTN_ESC,
+  BTN_COUNT
+} button_id_t;
+
+typedef enum {
+  ACTION_BTN_PRESS/*,
+  ACTION_BTN_RELEASE*/
+} button_action_type_t;
+
+typedef struct {
+  button_id_t id;
+  button_action_type_t action;
+  uint32_t time;
+} button_event_t;
 
 extern QueueHandle_t isrButtonQueue;
 extern QueueHandle_t buttonEventQueue;

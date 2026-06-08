@@ -9,6 +9,7 @@
 
 #include "lcd.h"
 #include "xbm.h"
+#include "input.h"
 
 typedef enum {
   UI_IDLE,
@@ -26,3 +27,5 @@ typedef struct {
 extern QueueHandle_t uiQueue;
 
 void ui_setup(void);
+
+void ui_invoke_menu(uint8_t numberOfItems, char* names, void (*callbacks[])(void));

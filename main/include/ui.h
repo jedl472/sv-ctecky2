@@ -6,10 +6,12 @@
 #include "freertos/task.h"
 #include "freertos/queue.h"
 
+#include "esp_netif.h"
 
 #include "lcd.h"
 #include "xbm.h"
 #include "input.h"
+#include "wifi.h"
 
 typedef enum {
   UI_IDLE,
@@ -25,8 +27,8 @@ typedef struct {
 
 typedef struct {
     size_t length;
-    const char** names;
-    const bool* breakAfterClick;
+    char** names;
+    bool* breakAfterClick;
     void **args;
     void (**callbacks)(void*);
 } ui_menu_struct_t;

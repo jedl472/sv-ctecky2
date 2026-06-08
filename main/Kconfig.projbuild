@@ -1,21 +1,17 @@
 # put here your custom config value
-menu "Example Configuration"
-config ESP_WIFI_SSID
-    string "WiFi SSID"
-    default "myssid"
-    help
-	SSID (network name) for the example to connect to.
-
-config ESP_WIFI_PASSWORD
-    string "WiFi Password"
-    default "mypassword"
-    help
-	WiFi password (WPA or WPA2) for the example to use.
-endmenu
+# menu "Strela-Vlna WiFi config"
+# config SV_WIFI0_SSID
+#     string "SSID 0"
+#     default "ssid0"
+#
+# config SV_WIFI0_PASSWORD
+#     string "PASSKEY 0"
+#     default "mypassword"
+# endmenu
 
 
 
-menu "Strela-Vlna system config"
+menu "Strela-Vlna general config"
 config SV_SOFTWARE_VERSION
     string "Software version"
     default "2.0 beta"
@@ -36,4 +32,12 @@ config SV_SECRET_KEY
     default "<super-secret-key>"
     help
     Key that the device will use to authenticate itself with the server (temporary before some real encryption can be implemented).
+
+config SV_WIFI_SSID
+    string "WiFi SSID"
+    default "<ssid0>:<ssid1>:<ssid2>"
+
+config SV_WIFI_PASSWORD
+    string "WiFi password"
+    default "<pass0>:<pass1>:<pass2>"
 endmenu

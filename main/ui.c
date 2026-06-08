@@ -52,6 +52,17 @@ void ui_update_task(void *args) {
 
         case UI_SYS_INFO_POPUP:
             // u8g2.drawXBM(64, 25, 80, 40, xbm_strela_vlna_logo_small);
+            char ip_str[16]; //format ip data into buffers
+            char gw_str[16];
+
+            snprintf(ip_str,
+                     sizeof(ip_str),
+                     IPSTR,
+                     IP2STR(&ip_info.ip));
+            snprintf(gw_str,
+                     sizeof(gw_str),
+                     IPSTR,
+                     IP2STR(&ip_info.gw));
             
             u8g2_SetFont(&lcd, u8g2_font_profont10_tf );
 
@@ -70,8 +81,8 @@ void ui_update_task(void *args) {
             u8g2_DrawStr(&lcd, 0, 35, "GW:");
             u8g2_DrawStr(&lcd, 0, 50, "server:");
     
-            u8g2_DrawStr(&lcd, 20, 25, "<ip>");
-            u8g2_DrawStr(&lcd, 20, 35, "<gw>");
+            u8g2_DrawStr(&lcd, 20, 25, ip_str);
+            u8g2_DrawStr(&lcd, 20, 35, gw_str);
             u8g2_DrawStr(&lcd, 0, 60, "<server>");
 
             break;
@@ -108,7 +119,7 @@ void ui_menu_invoke(void* ui_menu_struct) {
     ui_menu_struct_t *menu = ui_menu_struct;
 
     button_event_t button_event;
-    uint8_t cursorPos = 0;    
+    size_t cursorPos = 0;    
     bool menuActive = true;
 
     _ui_menu_draw(menu, cursorPos); 

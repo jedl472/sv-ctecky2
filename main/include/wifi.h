@@ -21,3 +21,13 @@ esp_err_t app_wifi_disconnect(void);
 
 esp_err_t app_wifi_deinit(void);
 
+
+typedef struct {
+    char *ssid;
+    char *psk;
+} wifi_network_t;
+
+extern size_t wifi_network_count;
+extern wifi_network_t *wifi_networks;
+
+extern esp_netif_ip_info_t ip_info;

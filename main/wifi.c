@@ -21,6 +21,80 @@ static esp_event_handler_instance_t wifi_event_handler;
 
 static EventGroupHandle_t s_wifi_event_group = NULL;
 
+wifi_network_t *wifi_networks;
+size_t wifi_network_count;
+
+esp_netif_ip_info_t ip_info;
+
+static size_t _count_tokens(const char *str)
+{
+    if (!str || !*str)
+        return 0;
+
+    size_t count = 1;
+
+    for (const char *p = str; *p; p++) {
+        if (*p == ':')
+            count++;
+    }
+
+    return count;
+}
+
+esp_err_t _wifi_load_config(void)
+{
+    size_t ssid_count = _count_tokens(CONFIG_SV_WIFI_SSID);
+    size_t psk_count  = _count_tokens(CONFIG_SV_WIFI_PASSWORD);
+
+    if (ssid_count != psk_count) {
+        return ESP_ERR_INVALID_SIZE;
+    }
+
+    wifi_networks = calloc(ssid_count, sizeof(wifi_network_t));
+    if (!wifi_networks) {
+        return ESP_ERR_NO_MEM;
+    }
+
+    char *ssid_copy = strdup(CONFIG_SV_WIFI_SSID);
+    char *psk_copy  = strdup(CONFIG_SV_WIFI_PASSWORD);
+
+    if (!ssid_copy || !psk_copy) {
+        free(ssid_copy);
+        free(psk_copy);
+        free(wifi_networks);
+        wifi_networks = NULL;
+        return ESP_ERR_NO_MEM;
+    }
+
+    char *ssid_saveptr = NULL;
+    char *psk_saveptr = NULL;
+
+    char *ssid_tok = strtok_r(ssid_copy, ":", &ssid_saveptr);
+    char *psk_tok  = strtok_r(psk_copy, ":", &psk_saveptr);
+
+    size_t idx = 0;
+
+    while (ssid_tok && psk_tok) {
+        wifi_networks[idx].ssid = strdup(ssid_tok);
+        wifi_networks[idx].psk  = strdup(psk_tok);
+
+        idx++;
+
+        ssid_tok = strtok_r(NULL, ":", &ssid_saveptr);
+        psk_tok  = strtok_r(NULL, ":", &psk_saveptr);
+    }
+
+    wifi_network_count = idx;
+
+    free(ssid_copy);
+    free(psk_copy);
+
+    return ESP_OK;
+}
+
+
+
+
 
 static void ip_event_cb(void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
 {
@@ -140,6 +214,21 @@ esp_err_t app_wifi_init(void) {
                                                         &ip_event_cb,
                                                         NULL,
                                                         &ip_event_handler));
+    
+    ret = _wifi_load_config();
+    if(ret != ESP_OK) {
+        return ret;
+    }
+    
+    ESP_LOGI(TAG, "Number of configured networks: %d", wifi_network_count);
+    for (size_t i = 0; i < wifi_network_count; i++) {
+        ESP_LOGI(TAG,
+                 "Network %u: SSID=%s PSK=%s",
+                 (unsigned)i,
+                 wifi_networks[i].ssid,
+                 wifi_networks[i].psk);
+    }
+    
     return ret;
 }
 
@@ -170,6 +259,10 @@ esp_err_t app_wifi_connect(char* wifi_ssid, char* wifi_password)
 
     if (bits & WIFI_CONNECTED_BIT) {
         ESP_LOGI(TAG, "Connected to Wi-Fi network: %s", wifi_config.sta.ssid);
+
+        esp_netif_t *netif = esp_netif_get_handle_from_ifkey("WIFI_STA_DEF"); //fetch wifi info just after succesfull connect
+        esp_netif_get_ip_info(netif, &ip_info);
+
         return ESP_OK;
     } else if (bits & WIFI_FAIL_BIT) {
         ESP_LOGE(TAG, "Failed to connect to Wi-Fi network: %s", wifi_config.sta.ssid);
@@ -183,10 +276,6 @@ esp_err_t app_wifi_connect(char* wifi_ssid, char* wifi_password)
 
 esp_err_t app_wifi_disconnect(void)
 {
-    if (s_wifi_event_group) {
-        vEventGroupDelete(s_wifi_event_group);
-    }
-
     return esp_wifi_disconnect();
 }
 
@@ -201,6 +290,11 @@ esp_err_t app_wifi_deinit(void)
     ESP_ERROR_CHECK(esp_wifi_deinit());
     ESP_ERROR_CHECK(esp_wifi_clear_default_wifi_driver_and_handlers(tutorial_netif));
     esp_netif_destroy(tutorial_netif);
+    
+    if (s_wifi_event_group) {
+        vEventGroupDelete(s_wifi_event_group);
+    }
+
 
     ESP_ERROR_CHECK(esp_event_handler_instance_unregister(IP_EVENT, ESP_EVENT_ANY_ID, ip_event_handler));
     ESP_ERROR_CHECK(esp_event_handler_instance_unregister(WIFI_EVENT, ESP_EVENT_ANY_ID, wifi_event_handler));

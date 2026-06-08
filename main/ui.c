@@ -105,6 +105,7 @@ void ui_setup(void) {
 
 void _ui_menu_draw(ui_menu_struct_t* ui_menu_struct, uint8_t cursorPos) {
     u8g2_ClearBuffer(&lcd); 
+    u8g2_DrawXBM(&lcd, 64, 25, 80, 40, xbm_strela_vlna_logo_small);
     u8g2_SetFont(&lcd, u8g2_font_5x8_tf);
 
     for(int i = 0; i < ui_menu_struct->length; i++) {

@@ -35,38 +35,38 @@ void cb_soft_reboot(void *args) {
 }
 
 void cb_connect_wifi(void *args) {
-    int index = (int)(intptr_t)args;
-    wifi_config_t cfg = {0};
-
-strlcpy((char *)cfg.sta.ssid,
-        wifi_networks[index].ssid,
-        sizeof(cfg.sta.ssid));
-
-strlcpy((char *)cfg.sta.password,
-        wifi_networks[index].psk,
-        sizeof(cfg.sta.password));
-
-esp_err_t err = esp_wifi_disconnect();
-
-if (err != ESP_OK &&
-    err != ESP_ERR_WIFI_NOT_STARTED &&
-    err != ESP_ERR_WIFI_NOT_INIT)
-{
-    ESP_ERROR_CHECK(err);
+//     int index = (int)(intptr_t)args;
+//     wifi_config_t cfg = {0};
+//
+// strlcpy((char *)cfg.sta.ssid,
+//         wifi_networks[index].ssid,
+//         sizeof(cfg.sta.ssid));
+//
+// strlcpy((char *)cfg.sta.password,
+//         wifi_networks[index].psk,
+//         sizeof(cfg.sta.password));
+//
+// esp_err_t err = esp_wifi_disconnect();
+//
+// if (err != ESP_OK &&
+//     err != ESP_ERR_WIFI_NOT_STARTED &&
+//     err != ESP_ERR_WIFI_NOT_INIT)
+// {
+//     ESP_ERROR_CHECK(err);
+// }
+//
+// ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &cfg));
+//
+// wifi_mode_t mode;
+// ESP_ERROR_CHECK(esp_wifi_get_mode(&mode));
+//
+// if (mode == WIFI_MODE_NULL) {
+//     ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
+// }
+//
+// ESP_ERROR_CHECK(esp_wifi_start()); 
+// ESP_ERROR_CHECK(esp_wifi_connect());
 }
-
-ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &cfg));
-
-wifi_mode_t mode;
-ESP_ERROR_CHECK(esp_wifi_get_mode(&mode));
-
-if (mode == WIFI_MODE_NULL) {
-    ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
-}
-
-ESP_ERROR_CHECK(esp_wifi_start());   // <-- THIS is what you're missing
-
-ESP_ERROR_CHECK(esp_wifi_connect());}
 
 
 
@@ -82,15 +82,15 @@ void device_task(void *args) {
     switch (dev_mode) {
       case DEV_IDLE:
         if(xQueueReceive(nfcEventQueue, &nfc_event, 50/portTICK_PERIOD_MS)) { // MAGIC_VALUE: task pusti kazdych 50 ms
-          ui_msg.state = UI_MSG;
+          ui_msg.state = UI_REQUEST;
           strcpy(ui_msg.msg, "tag ready");
           xQueueSend(uiQueue, &ui_msg, portMAX_DELAY);
 
-          vTaskDelay(2000/portTICK_PERIOD_MS);
-
-          ui_msg.state = UI_IDLE;
-
-          xQueueSend(uiQueue, &ui_msg, portMAX_DELAY);
+          // vTaskDelay(2000/portTICK_PERIOD_MS);
+          //
+          // ui_msg.state = UI_IDLE;
+          //
+          // xQueueSend(uiQueue, &ui_msg, portMAX_DELAY);
         }
 
         if(xQueueReceive(buttonEventQueue, &button_event, 50/portTICK_PERIOD_MS)) {
@@ -157,18 +157,21 @@ void app_main(void) {
   input_setup();
   lcd_setup();
   ui_setup();
-  nfc_setup();
+  
 
   ui_msg_t ui_msg = {
     .state = UI_MSG,
-    .msg = "wifi testing"
+    .msg = "booting ..."
   };
 
   xQueueSend(uiQueue, &ui_msg, portMAX_DELAY);
 
-
+  nfc_setup();
   ESP_ERROR_CHECK(app_wifi_init());
+  
+  vTaskDelay(1000/portTICK_PERIOD_MS);
 
+  
   ui_msg.state = UI_IDLE;
   xQueueSend(uiQueue, &ui_msg, portMAX_DELAY);
 

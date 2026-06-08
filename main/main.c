@@ -161,7 +161,7 @@ void app_main(void) {
 
   ui_msg_t ui_msg = {
     .state = UI_MSG,
-    .msg = "booting ..."
+    .msg = "boot"
   };
 
   xQueueSend(uiQueue, &ui_msg, portMAX_DELAY);

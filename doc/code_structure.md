@@ -3,6 +3,21 @@ Všechna dokumentace je WIP (stejně jako kód).
 
 = jak to celé funguje dohromady. Bližší popisy co dělají individuální funkce jsou v headrech.
 
+## Schéma
+
+```
+		                          isrButtonQueue                   buttonEventQueue 
+fyzická tlačítka  ---->  gpio_isr_handler  ------------> button_control_task ------------>  |
+											    |
+											    |
+					  (knihovna)pn532                    nfcEventQueue  |
+                            NTAG čtečka    ------------>   nfc_control_task  ------------>  |	     |---> wifi stack (WIP)
+											    |	     |
+											    |	     |
+											    |	     |	        uiQueue
+											    |--> device_task  ------------>  ui_update_task
+```
+
 ## Tasky
 
 Na čtečce běží (nepočítaje nějaké WiFi daemony) tyto tasky:

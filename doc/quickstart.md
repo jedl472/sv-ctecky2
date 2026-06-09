@@ -1,12 +1,11 @@
-Všechna dokumentace je WIP (stejně jako kód).
-# QuickStart
+# Quick start
 
 Tato sekce dokumentace obsahuje návod jak s kompletně čistou čtečkou udělat setup před soutěží. Jednotlivé kroky:
+0. (udělat git clone)
 
-1. (udělat git clone)
-2. setup ESP-IDF (nastavení projektu, co repozitář neobsahuje)
-3. donastavení Kconfigu
-4. build a flash
+1. setup ESP-IDF (nastavení projektu, co repozitář neobsahuje)
+2. donastavení Kconfigu
+3. build a flash
 
 Pokud máte zkušenosti s Arduinem, kód pro ESP vypadá dost podobně, ale využívá FreeRTOS, což může na první pohled vypadat chaoticky. Do detailu je to popsáno v sekci struktura.md.
 
@@ -26,11 +25,11 @@ Jediná věc, co je (v tuto chvíli) potřeba udělat je ve složce spustit př�
 idf.py set-target esp32
 ```
 
-pak si IDF nestěžuje že, nebyla explicitně zadaná deska..
+pak si IDF nestěžuje že má problém s kompilací, protože nezná s jakou deskou pracuje.
 
 ## 2\. Setup Kconfigu
 
-Zde je už potřeba nastavit samotné údaje co čtečka potřebuje během soutěže. V hlavní složce projektu spustím příkaz:
+Zde je už potřeba nastavit samotné údaje co čtečka potřebuje během soutěže. V hlanví složce projektu spustím příkaz:
 
 ```bash
 idf.py menuconfig
@@ -48,7 +47,7 @@ Tam jsou kategorie:
 
 ## 3\. Build and flash
 
-Teď přijde čas na úžasné ESP-IDF, které po napsání tohoto příkazu postahuje všechny knihovny a vyřeší všechno za vás. Na začátek příkaz pusťte s parametrem "monitor" a zkontrolujte, že vše naběhlo v pořádku.
+Teď přijde čas na úžasné ESP-IDF, které po napsání tohoto příkazu postahuje všechny knihovny a vyřeší všechno za vás. Na začátek příkaz pusťte s parametrem "monitor" a zkontrolujte, že vše naběhlo v pořádku. Pak máte hotovo.
 
 ```bash
 idf.py build flash monitor

@@ -1,3 +1,7 @@
+/* 
+ * Zde se řeší všechno vykreslování a ui logika (menu).
+ */
+
 #pragma once
 
 #include <esp_log.h>
@@ -33,10 +37,13 @@ typedef struct {
     void (**callbacks)(void*);
 } ui_menu_struct_t;
 
+//metoda pro volání ui_update_tasku
 extern QueueHandle_t uiQueue;
 
 void ui_setup(void);
 
+//blokující callback metoda pro spuštění menu (patří k ní ui_menu_struct_t)
 void ui_menu_invoke(void* ui_menu_struct);
 
+//blokující metoda co zobrazí popup s informacemi o systému
 void ui_invoke_sys_info_popup(void* args);

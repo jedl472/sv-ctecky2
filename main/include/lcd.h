@@ -1,3 +1,7 @@
+/* 
+ * Zde se inicializuje u8g2 a hal, všechno vykreslování se řeší v ui.c  
+ */
+
 #ifndef LCD_H
 #define LCD_H 
 

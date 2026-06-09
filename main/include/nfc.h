@@ -1,3 +1,7 @@
+/* 
+ * Tento soubor se stará o setup a obhospodařování knihovny pn532.
+ */
+
 #pragma once
 
 #include <esp_log.h>
@@ -25,6 +29,7 @@ typedef struct {
   uint8_t uid_len;
 } nfc_event_t;
 
+// sem jdou data ze čtečny NTAG a také jí vyčítá device_task
 extern QueueHandle_t nfcEventQueue;
 
 void nfc_setup(void);

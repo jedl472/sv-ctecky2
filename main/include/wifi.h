@@ -1,3 +1,7 @@
+/* 
+ * Zde je celý setup wifi stacku, ale zatím moc nefunguje.
+ */
+
 #pragma once
 
 #include <inttypes.h>

@@ -1,3 +1,7 @@
+/* 
+ * Tento soubor řeší interrupty a stará se o všechno okolo tlačítek. 
+ */
+
 #ifndef INPUT_H
 #define INPUT_H
 
@@ -33,7 +37,10 @@ typedef struct {
   uint32_t time;
 } button_event_t;
 
+/* isrButtonQueue je zde pouze pro debug účely, nemělo by jí jinak vyčítat nic kromě funkcí v input.c (obsahuje čistá data z interruptů). */
 extern QueueHandle_t isrButtonQueue;
+
+/* Queue kam chodí stisky tlačítek (je vyčítaná device_task). */
 extern QueueHandle_t buttonEventQueue;
 
 void input_setup(void);

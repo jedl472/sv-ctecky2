@@ -6,16 +6,17 @@ Všechna dokumentace je WIP (stejně jako kód).
 ## Schéma
 
 ```
-		                          isrButtonQueue                   buttonEventQueue 
-fyzická tlačítka  ---->  gpio_isr_handler  ------------> button_control_task ------------>  |
-											    |
-											    |
-					  (knihovna)pn532                    nfcEventQueue  |
-                            NTAG čtečka    ------------>   nfc_control_task  ------------>  |	     |---> wifi stack (WIP)
-											    |	     |
-											    |	     |
-											    |	     |	        uiQueue
-											    |--> device_task  ------------>  ui_update_task
+
+	       (knihovna)pn532             nfcEventQueue |
+   NTAG čtečka    ------->   nfc_control_task  ------->  |
+		                                         |	   
+			       			         |	
+               isrButtonQueue           buttonEventQueue |
+gpio_isr_handler  -------> button_control_task ------->  |	   |---> wifi stack (WIP)
+						         |         |
+			                                 |	   |
+		                                         |	   |	    uiQueue
+				                         |--> device_task  ------->  ui_update_task
 ```
 
 ## Tasky

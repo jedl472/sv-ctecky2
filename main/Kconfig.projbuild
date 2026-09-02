@@ -12,6 +12,22 @@
 
 
 menu "Strela-Vlna general config"
+choice SV_SYS_MODE
+    prompt "System mode"
+    default SV_SYS_MODE_SERVER
+
+    config SV_SYS_MODE_SERVER
+        bool "Server"
+        help
+            Device connects to the defined server and sends data over Wi-Fi.
+
+    config SV_SYS_MODE_USB
+        bool "USB"
+        help
+            Device sends NFC data only over USB.
+
+endchoice
+
 config SV_SOFTWARE_VERSION
     string "Software version"
     default "2.0 beta"

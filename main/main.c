@@ -70,7 +70,7 @@ void cb_connect_wifi(void *args) {
 
 
 
-void device_task(void *args) {
+void server_device_task(void *args) {
   ESP_LOGI(TAG, "boot finished");
   dev_mode = DEV_IDLE;
 
@@ -147,7 +147,7 @@ void device_task(void *args) {
     }
 
   }
-}
+} /* void server_device_task */
 
 
 
@@ -167,15 +167,30 @@ void app_main(void) {
   xQueueSend(uiQueue, &ui_msg, portMAX_DELAY);
 
   nfc_setup();
-  ESP_ERROR_CHECK(app_wifi_init());
-  
-  vTaskDelay(1000/portTICK_PERIOD_MS);
 
-  
-  ui_msg.state = UI_IDLE;
-  xQueueSend(uiQueue, &ui_msg, portMAX_DELAY);
 
-  xTaskCreate(device_task, "device_task", 4096, NULL, 2, NULL);
+  #ifdef CONFIG_SV_SYS_MODE_SERVER
+
+    ESP_ERROR_CHECK(app_wifi_init());
+    vTaskDelay(1000/portTICK_PERIOD_MS);
+    
+    ui_msg.state = UI_IDLE;
+    xQueueSend(uiQueue, &ui_msg, portMAX_DELAY);
+
+    xTaskCreate(server_device_task, "server_device_task", 4096, NULL, 2, NULL);
+    
+    ESP_LOGI(TAG, "boot into server mode successful");
+  #endif /* ifdef CONFIG_SV_SYS_MODE_SERVER */
+  
+  #ifdef CONFIG_SV_SYS_MODE_USB
+    ui_msg.state = UI_MSG;
+    strcpy(ui_msg.msg, "USB mode");
+    xQueueSend(uiQueue, &ui_msg, portMAX_DELAY);
+
+    ESP_LOGI(TAG, "boot into USB mode successful");
+
+
+  #endif /* ifdef CONFIG_SV_SYS_MODE_USB */
 }
 
 

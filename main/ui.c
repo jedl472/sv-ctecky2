@@ -170,3 +170,23 @@ void ui_invoke_sys_info_popup(void *args) {
         }
     }
 }
+
+void ui_invoke_msg(uint32_t timeout, char* msg) {
+    ui_msg_t ui_msg = {
+        .state = UI_MSG,
+        .msg = "\0"
+    };
+
+    
+    strcpy(ui_msg.msg, msg);
+
+    xQueueSend(uiQueue, &ui_msg, portMAX_DELAY);
+
+    if(timeout != 0) {
+        vTaskDelay(timeout/portTICK_PERIOD_MS);
+
+        ui_msg.state = UI_IDLE;
+        xQueueSend(uiQueue, &ui_msg, portMAX_DELAY);
+    }
+
+}

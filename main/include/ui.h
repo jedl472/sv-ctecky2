@@ -47,3 +47,6 @@ void ui_menu_invoke(void* ui_menu_struct);
 
 //blokující metoda co zobrazí popup s informacemi o systému
 void ui_invoke_sys_info_popup(void* args);
+
+//zobrazi popup zpravu na displeji
+void ui_invoke_msg(uint32_t timeout, char* msg);

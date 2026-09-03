@@ -28,7 +28,7 @@ static const char* TAG = "main";
 
 
 void cb_request_return_last(void *args) {
-    printf("invoked return last action\n");
+    // printf("invoked return last action\n");
 }
 
 void cb_soft_reboot(void *args) {
@@ -152,18 +152,31 @@ void server_device_task(void *args) {
 } /* void server_device_task */
 
 
-#define USB_UART_BUF_SIZE (32)
+#define USB_UART_BUF_SIZE (4096)
 
 void usb_device_task(void *args) {
     
     nfc_event_t nfc_event;
-    int8_t start_byte = 0x00;
-
+    
+    uint8_t tx_buffer[10];
+    uint8_t checksum;
+    
     while (true) {
         if(xQueueReceive(nfcEventQueue, &nfc_event, 50/portTICK_PERIOD_MS)) { // TODO: MAGIC_VALUE
-          uart_write_bytes(UART_NUM_0, &start_byte, 1);
-          uart_write_bytes(UART_NUM_0, nfc_event.uid, 7);
-          printf("nfc event\n");
+            //prefix bytes
+            tx_buffer[0] = 0xAA; 
+            tx_buffer[1] = 0x55;
+
+            //xor checksum
+            checksum = 0;
+            for (int i = 0; i < 7; i++) {
+                tx_buffer[2 + i] = nfc_event.uid[i];
+                checksum ^= nfc_event.uid[i];
+            }
+
+            tx_buffer[9] = checksum;
+
+            uart_write_bytes(UART_NUM_0, tx_buffer, sizeof(tx_buffer));
         }
 
     }
@@ -204,9 +217,8 @@ void app_main(void) {
   #endif /* ifdef CONFIG_SV_SYS_MODE_SERVER */
   
   #ifdef CONFIG_SV_SYS_MODE_USB
-    ui_msg.state = UI_MSG;
-    strcpy(ui_msg.msg, "USB mode");
-    xQueueSend(uiQueue, &ui_msg, portMAX_DELAY);
+    char* msg = "USB mode";
+    ui_invoke_msg(0, msg); 
 
     ESP_LOGI(TAG, "boot into USB mode successful");
 

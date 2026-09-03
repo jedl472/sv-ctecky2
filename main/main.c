@@ -1,4 +1,5 @@
 #include <driver/gpio.h>
+#include <driver/uart.h>
 #include <driver/spi_master.h>
 #include <esp_log.h>
 #include <freertos/FreeRTOS.h>
@@ -22,6 +23,7 @@ typedef enum {
 dev_mode_t dev_mode = DEV_BOOT;
 
 static const char* TAG = "main";
+
 
 
 
@@ -81,7 +83,7 @@ void server_device_task(void *args) {
   while (true) {
     switch (dev_mode) {
       case DEV_IDLE:
-        if(xQueueReceive(nfcEventQueue, &nfc_event, 50/portTICK_PERIOD_MS)) { // MAGIC_VALUE: task pusti kazdych 50 ms
+        if(xQueueReceive(nfcEventQueue, &nfc_event, 50/portTICK_PERIOD_MS)) { // TODO:  MAGIC_VALUE
           ui_msg.state = UI_REQUEST;
           strcpy(ui_msg.msg, "tag ready");
           xQueueSend(uiQueue, &ui_msg, portMAX_DELAY);
@@ -129,7 +131,7 @@ void server_device_task(void *args) {
                 
                 ui_menu_invoke((void*)&menu);
 
-                free(menu_wifi.names); //TODO: zbavit se tady to dost zavazi
+                free(menu_wifi.names); //TODO: zbavit se
                 free(menu_wifi.breakAfterClick);
                 free(menu_wifi.args);
                 free(menu_wifi.callbacks);
@@ -150,10 +152,29 @@ void server_device_task(void *args) {
 } /* void server_device_task */
 
 
+#define USB_UART_BUF_SIZE (32)
+
+void usb_device_task(void *args) {
+    
+    nfc_event_t nfc_event;
+    int8_t start_byte = 0x00;
+
+    while (true) {
+        if(xQueueReceive(nfcEventQueue, &nfc_event, 50/portTICK_PERIOD_MS)) { // TODO: MAGIC_VALUE
+          uart_write_bytes(UART_NUM_0, &start_byte, 1);
+          uart_write_bytes(UART_NUM_0, nfc_event.uid, 7);
+          printf("nfc event\n");
+        }
+
+    }
+
+} /* void usb_device_task */
+
+
+
 
 
 void app_main(void) {
-  printf("APP_MAIN\n");
   input_setup();
   lcd_setup();
   ui_setup();
@@ -189,6 +210,19 @@ void app_main(void) {
 
     ESP_LOGI(TAG, "boot into USB mode successful");
 
+
+    uart_config_t uart_config = {
+        .baud_rate = 115200,
+        .data_bits = UART_DATA_8_BITS,
+        .parity    = UART_PARITY_DISABLE,
+        .stop_bits = UART_STOP_BITS_1,
+        .flow_ctrl = UART_HW_FLOWCTRL_DISABLE
+    };
+
+    uart_driver_install(UART_NUM_0, USB_UART_BUF_SIZE * 2, 0, 0, NULL, 0);
+    uart_param_config(UART_NUM_0, &uart_config);
+
+    xTaskCreate(usb_device_task, "usb_device_task", 4096, NULL, 2, NULL);
 
   #endif /* ifdef CONFIG_SV_SYS_MODE_USB */
 }
